@@ -1,5 +1,6 @@
 #include "dispdata.h"
 
+
 Dispdata::Dispdata(QListWidget*parent)
     :QListWidget(parent)
 {
