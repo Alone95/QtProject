@@ -143,10 +143,12 @@ void Login::on_loginBtn_clicked()
             }
             else
             {
+                this->close();
                 //用户名和密码均正确
                 MainWindow *mw =new MainWindow();
-                this->hide();
                 mw->show();
+
+
             }
         }
     }
