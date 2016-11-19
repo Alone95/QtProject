@@ -5,29 +5,35 @@
 #include <QMessageBox>
 #include <QMargins>
 #include <QLineEdit>
+#include"workerthread.h"
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-   ui->setupUi(this);
-   initlayout();//初始化布局
-   connect(cbo_sex, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(on_sel_sex(const QString &)));
-   connect(edit, SIGNAL(returnPressed()), this, SLOT(search()));
-   connect(pSearchButton,SIGNAL(clicked(bool)),this,SLOT(search()));
-   connect(fileTreeview,SIGNAL(getText(QString)),this,SLOT(setText(QString)));
+    ui->setupUi(this);
 
-   //整合1
-   mShowToolFile=false;
-   mShowToolEdit=false;
-   mShowToolAbout=false;
+    initlayout();//初始化布局
+    connect(cbo_sex, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(on_sel_sex(const QString &)));
+    connect(edit, SIGNAL(returnPressed()), this, SLOT(search()));
+    connect(pSearchButton,SIGNAL(clicked(bool)),this,SLOT(search()));
+    connect(fileTreeview,SIGNAL(getText(QString)),this,SLOT(setText(QString)));
+
+    //整合1
+    mShowToolFile=false;
+    mShowToolEdit=false;
+    mShowToolAbout=false;
 }
+
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-QFileInfoList MainWindow::GetFileList(const QString&path)
+
+
+
+QFileInfoList MainWindow::getFileList(const QString&path)
 {
     QDir dir(path);
     QString filter;
@@ -36,47 +42,20 @@ QFileInfoList MainWindow::GetFileList(const QString&path)
     for(int i=0;i!=folder_list.size();i++)
     {
         QString name =folder_list.at(i).absoluteFilePath();
-        QFileInfoList child_file_list =GetFileList(name);
+        QFileInfoList child_file_list =getFileList(name);
         file_list.append(child_file_list);
     }
-     foreach(QFileInfo fileinfo,file_list)
-     {
+    foreach(QFileInfo fileinfo,file_list)
+    {
         filter= fileinfo.suffix();
         if((filter!="xls")&&(filter!="txt")&&(filter!="jpg")&&(filter!="png"))
         {
             continue;
         }
-        stringlist.append(fileinfo.filePath());
-     }
-     return file_list;
+        mStringlist.append(fileinfo.filePath());
+    }
+    return file_list;
 }
-
-//void MainWindow::listAll(const QString&path)
-//{
-//    QDir dir(path);
-//    //    qDebug()<<path;
-//    foreach(QFileInfo mfi,dir.entryInfoList())
-//    {
-//        if(mfi.isFile())
-//        {
-
-//            //            qDebug()<< "File :" << mfi.fileName();
-//            if(mfi.suffix()=="xls"||mfi.suffix()=="txt")
-//            {
-//                stringlist.append(mfi.fileName());
-//                qDebug()<< "File :" << mfi.fileName();
-//            }
-//        }
-//        else
-//        {
-//            if(mfi.fileName()=="." || mfi.fileName() == "..")continue;
-//            //            qDebug() << "Entry Dir" << mfi.absoluteFilePath();
-//            listAll(mfi.absoluteFilePath());
-//        }
-//    }
-//}
-
-
 
 
 void MainWindow::initlayout()
@@ -85,18 +64,14 @@ void MainWindow::initlayout()
     cbo_sex->addItem(QWidget::tr("本地文件"));
     cbo_sex->addItem(QWidget::tr("数据库文件"));
 
-    //    QDir currentDir("F:");
-//    listAll("C:");
-//    listAll("F:");
-//    listAll("D:");
-    GetFileList("G:");
-
-    QStringList sl;
-    sl=stringlist;
     //    sl=currentDir.entryList(QStringList("*"),QDir::Files|QDir::Dirs);
-
     //    QStringList sl = QStringList() << "Biao" << "Bin" << "Huang" << "Hua" << "Hello" << "BinBin" << "Hallo";
-    edit= new CompleteLineEdit(sl);
+//    edit= new CompleteLineEdit;
+    edit=new QLineEdit;
+    completer =new QCompleter;
+    model =new QDirModel;
+    completer->setModel(model);
+    edit->setCompleter(completer);
     pSearchButton=  new QPushButton();
     pSearchButton->setCursor(Qt::PointingHandCursor);
     pSearchButton->setFixedSize(22, 22);
@@ -191,7 +166,7 @@ void MainWindow::creatToolBars_File()
     QWidget *noTitleBarToolFile=new QWidget;
     mTopWidgetToolFile->setTitleBarWidget(noTitleBarToolFile);
     mTopWidgetToolFile->setMaximumHeight(40);
-//    m_topWidget_Tool_File->setMaximumWidth(250);
+    //    m_topWidget_Tool_File->setMaximumWidth(250);
     this->addDockWidget(Qt::TopDockWidgetArea,mTopWidgetToolFile);
 
     //Tool_File_Btn
@@ -300,10 +275,7 @@ void MainWindow::on_action_Tool_File_triggered()
 
 
     }
-//    else
-//    {
-//        QMessageBox::about(0,tr("提示"),tr("文件窗口已显示！"));
-//    }
+
 }
 
 void MainWindow::on_action_Tool_Edit_triggered()
@@ -324,10 +296,6 @@ void MainWindow::on_action_Tool_Edit_triggered()
         setToolBtnLayout_Edit();
         mShowToolEdit=true;
     }
-//    else
-//    {
-//        QMessageBox::about(0,tr("提示"),tr("编辑口已显示！"));
-//    }
 }
 
 void MainWindow::on_action_Tool_About_triggered()
@@ -354,7 +322,7 @@ void MainWindow::on_action_Tool_About_triggered()
 SetToolBtn::SetToolBtn(QString background, QString toolTips,QWidget *parent):
     QToolButton(parent)
 {
-//    normalPixmap.load(background);
+    //    normalPixmap.load(background);
     this->setIcon(QIcon(background));
     this->setIconSize(QSize(30,30));
     this->setFixedSize(30,30);

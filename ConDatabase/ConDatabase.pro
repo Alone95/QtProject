@@ -19,7 +19,8 @@ SOURCES += main.cpp             \
            qpasswordlineedit.cpp\
            completelineedit.cpp \
     filetreeview.cpp \
-    dispdata.cpp
+    dispdata.cpp \
+    workerthread.cpp
 
 HEADERS  += mainwindow.h \
     cmysplashscreen.h \
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h \
     completelineedit.h \
     completelineedit.h \
     filetreeview.h \
-    dispdata.h
+    dispdata.h \
+    workerthread.h
 
 
 FORMS    += mainwindow.ui \

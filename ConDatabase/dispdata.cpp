@@ -39,9 +39,8 @@ void Dispdata::display()
         {
 
             listWidgetItem =new QListWidgetItem;
-//            listWidgetItem->setIcon(QIcon(":/myImages/images/yafeilinux.png"));
             listWidgetItem->setText(QString(sqlTable->value(0).toString()));
-            judge_filetype(QString(sqlTable->value(0).toString()));
+            judge_filetype(QString(sqlTable->value(0).toString()));//判断类型
             listWidgetItem->setSizeHint(QSize(30,30));
             listWidgetItem->setForeground(Qt::black);//前景色
             listWidgetItem->setToolTip(QString(sqlTable->value(0).toString()));
@@ -78,6 +77,10 @@ void Dispdata::judge_filetype(const QString&filename)
         listWidgetItem->setIcon(QIcon(":/myImages/images/icon/xlsx_win.png"));
     else if(str=="pdf")
         listWidgetItem->setIcon(QIcon(":/myImages/images/icon/pdf.png"));
+    else if(str=="png")
+        listWidgetItem->setIcon(QIcon(":/myImages/images/icon/png.png"));
+    else if(str=="jpg")
+        listWidgetItem->setIcon(QIcon(":/myImages/images/icon/jpeg.png"));
     else
         listWidgetItem->setIcon(QIcon(":/myImages/images/yafeilinux.png"));
 
@@ -89,7 +92,7 @@ void Dispdata::connsql()
 {
 
     db = QSqlDatabase::addDatabase("QOCI");
-    db.setHostName("127.0.0.1");
+    db.setHostName("Lenovo-PC");
     db.setDatabaseName("orcl");
     db.setUserName("lds");
     db.setPassword("123456");
@@ -162,12 +165,13 @@ void Dispdata::add_data()
             add.bindValue(1,var);
             if(add.exec()){
                 qWarning("Enable to execute prepared query");
-                QListWidgetItem * listWidgetItem =new QListWidgetItem;
-                listWidgetItem->setIcon(QIcon(":/myImages/images/yafeilinux.png"));
+                listWidgetItem =new QListWidgetItem;
                 listWidgetItem->setText(QString(fileName[i]));
-                listWidgetItem->setSizeHint(QSize(50,50));
+                judge_filetype(QString(fileName[i]));
+                listWidgetItem->setSizeHint(QSize(30,30));
+                listWidgetItem->setToolTip(QString(fileName[i]));
                 listWidgetItem->setForeground(Qt::black);//前景色
-                listWidgetItem->setFont(QFont("Times",22,QFont::Bold));
+                listWidgetItem->setFont(QFont("Times",22));
                 this->addItem(listWidgetItem);
             }
 

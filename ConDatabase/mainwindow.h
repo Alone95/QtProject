@@ -28,7 +28,7 @@
 #include "treeview.h"
 #include"dispdata.h"
 #include"filetreeview.h"
-
+#include"workerthread.h"
 class SetToolBtn : public QToolButton
 {
     Q_OBJECT
@@ -37,7 +37,7 @@ public:
 
 signals:
 
-public slots:
+
 
 protected:
 //    void paintEvent(QPaintEvent *);
@@ -71,6 +71,9 @@ private slots:
     void on_sel_sex(const QString &text);
     void search();
     void setText(const QString&string);
+//    void finishThread(const QStringList&stringlist);
+
+
     //整合1
     void on_action_Tool_File_triggered();
 
@@ -78,14 +81,16 @@ private slots:
 
     void on_action_Tool_About_triggered();
 
+signals:
 
 private:
     Ui::MainWindow *ui;
     void initlayout();
     void listAll(const QString &index);
-    QFileInfoList GetFileList(const QString&path);
+    QFileInfoList getFileList(const QString&path);
 private:
-    QStringList stringlist;
+    WorkerThread *mWorkerthread;
+    QStringList mStringlist;
 //    TreeView    *mTreeView;
     QDockWidget *mcenter;
     QDockWidget *mUpLeftDock;
@@ -103,7 +108,10 @@ private:
     QComboBox *cbo_sex;
     QHBoxLayout *hLayout;
     QPushButton *pSearchButton;
-    CompleteLineEdit *edit;
+//    CompleteLineEdit *edit;
+    QLineEdit *edit;
+    QCompleter *completer;
+    QDirModel * model ;
     QHBoxLayout *pcbosex_Layout;
     FileTreeview * fileTreeview;
     Dispdata *dispdata;

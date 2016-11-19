@@ -7,18 +7,28 @@
 #include<QStringListModel>
 #include <QDebug>
 
-CompleteLineEdit::CompleteLineEdit(QStringList words, QWidget *parent)
-    : QLineEdit(parent), words(words)
+
+CompleteLineEdit::CompleteLineEdit( QWidget *parent)
+    : QLineEdit(parent)
 {
+    workerthread =new WorkerThread;
+    workerthread->start();
     listView = new QListView(this);//下拉列表
     model = new QStringListModel(this);
     listView->setWindowFlags(Qt::ToolTip);//
     connect(this, SIGNAL(textChanged(const QString &)), this, SLOT(setCompleter(const QString &)));
     connect(listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(completeText(const QModelIndex &)));
+    connect(workerthread,SIGNAL(sendStringlist(QStringList)),this,SLOT(getStringList(QStringList)));
+}
+
+void CompleteLineEdit::getStringList(const QStringList &stringlist)
+{
+    words=stringlist;
+    qDebug()<<"words's length="<<words.size();
 }
 
 void CompleteLineEdit::focusOutEvent(QFocusEvent *e) {
-    //listView->hide();
+    listView->hide();
 }
 
 void CompleteLineEdit::keyPressEvent(QKeyEvent *e) {
@@ -92,6 +102,7 @@ void CompleteLineEdit::setCompleter(const QString &text) {
         }
     }
 
+
     model->setStringList(sl);//将s1加载到模型里面
     listView->setModel(model);//将模型弄到显示表里面
 
@@ -108,8 +119,9 @@ void CompleteLineEdit::setCompleter(const QString &text) {
     int y = mapToGlobal(p).y() + 1;
 
     listView->move(x, y);
-
+    listView->setFocus();
     listView->show();
+
 }
 
 void CompleteLineEdit::completeText(const QModelIndex &index) {
