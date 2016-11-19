@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += sql
+QT       += webkit
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -20,7 +21,8 @@ SOURCES += main.cpp             \
            completelineedit.cpp \
     filetreeview.cpp \
     dispdata.cpp \
-    workerthread.cpp
+    workerthread.cpp \
+    browser.cpp
 
 HEADERS  += mainwindow.h \
     cmysplashscreen.h \
@@ -31,12 +33,14 @@ HEADERS  += mainwindow.h \
     completelineedit.h \
     filetreeview.h \
     dispdata.h \
-    workerthread.h
+    workerthread.h \
+    browser.h
 
 
 FORMS    += mainwindow.ui \
     login.ui \
-    registeruser.ui
+    registeruser.ui \
+    browser.ui
 
 RESOURCES += \
     myresources.qrc

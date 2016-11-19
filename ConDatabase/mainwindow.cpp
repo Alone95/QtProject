@@ -5,7 +5,7 @@
 #include <QMessageBox>
 #include <QMargins>
 #include <QLineEdit>
-#include"workerthread.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     initlayout();//初始化布局
+
     connect(cbo_sex, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(on_sel_sex(const QString &)));
     connect(edit, SIGNAL(returnPressed()), this, SLOT(search()));
     connect(pSearchButton,SIGNAL(clicked(bool)),this,SLOT(search()));
@@ -95,10 +96,12 @@ void MainWindow::initlayout()
     pSearchLayout->addWidget(edit);
 
 
-    mUpLeftDock = new QDockWidget(tr("左上窗口"),this);
-    mUpRightDock = new QDockWidget(tr("右上窗口"),this);
-    mDownLeftDock = new QDockWidget(tr("左下窗口"),this);
-    mDownRightDock = new QDockWidget(tr("右下窗口"),this);
+    mUpLeftDock = new QDockWidget(tr("我的电脑"),this);
+    mUpRightDock = new QDockWidget(tr("主界面"),this);
+    mDownLeftDock = new QDockWidget(tr("数据库"),this);
+    mDownRightDock = new QDockWidget(tr("浏览器"),this);
+
+    setCentralWidget(mUpLeftDock);
     addDockWidget(Qt::LeftDockWidgetArea,mUpLeftDock);
     splitDockWidget(mUpLeftDock,mUpRightDock,Qt::Horizontal);
     splitDockWidget(mUpLeftDock,mDownLeftDock,Qt::Vertical);
@@ -106,11 +109,12 @@ void MainWindow::initlayout()
     mUpLeftDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     mDownLeftDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
 
+    mUpLeftDock->setMinimumWidth(200);
+    mDownLeftDock->setMinimumWidth(200);
     mUpLeftDock->setMaximumWidth(300);
     mDownLeftDock->setMaximumWidth(300);
-    mUpRightDock->setMinimumWidth(600);
-    mDownRightDock->setMinimumWidth(600);
 
+    mDownRightDock->adjustSize();
     fileTreeview =new FileTreeview();
     QVBoxLayout *vboxLayout= new QVBoxLayout();
     vboxLayout->addLayout(pSearchLayout);
@@ -126,8 +130,14 @@ void MainWindow::initlayout()
     textEdit2 = new QTextEdit("右上侧");
     mUpRightDock->setWidget(textEdit2);
 
-    textEdit3 = new QTextEdit("右下侧");
-    mDownRightDock->setWidget(textEdit3);
+
+    Browser *browser =new Browser();
+    browser->show();
+    mDownRightDock->setWidget(browser);
+
+
+
+
 }
 
 void MainWindow::on_sel_sex(const QString &text)
@@ -250,10 +260,10 @@ void MainWindow::setToolBtnLayout_About()
     mTextToolAbout->setLayout(mHlayoutToolAbout);
 }
 
-void MainWindow::setDockMaximumSize()
-{
-    mText2->setMaximumSize(16777215, 16777215);
-}
+//void MainWindow::setDockMaximumSize()
+//{
+//    mText2->setMaximumSize(16777215, 16777215);
+//}
 
 void MainWindow::on_action_Tool_File_triggered()
 {

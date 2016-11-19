@@ -29,6 +29,7 @@
 #include"dispdata.h"
 #include"filetreeview.h"
 #include"workerthread.h"
+#include"browser.h"
 class SetToolBtn : public QToolButton
 {
     Q_OBJECT
@@ -65,7 +66,7 @@ public:
     void setToolBtnLayout_File();
     void setToolBtnLayout_Edit();
     void setToolBtnLayout_About();
-    void setDockMaximumSize();
+//    void setDockMaximumSize();
 
 private slots:
     void on_sel_sex(const QString &text);
