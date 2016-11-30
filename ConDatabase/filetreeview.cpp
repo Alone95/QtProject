@@ -1,21 +1,24 @@
 #include "filetreeview.h"
-
+#include<QDirModel>
 FileTreeview::FileTreeview(QTreeView *parent)
     :QTreeView(parent)
 {
-    QFileSystemModel *model =new QFileSystemModel();
+    model =new QFileSystemModel();
     model->setRootPath("");
     this->setModel(model);
     this->setRootIndex(model->index(""));
-    connect(this,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(test()));
+    connect(this,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(test(QModelIndex)));
 }
 
 
 
-void FileTreeview::test()
+void FileTreeview::test(const QModelIndex &index)
 {
-    QModelIndex index =this->currentIndex();
-    emit getText(index.data().toString());
+
+    qDebug()<<model->filePath(index);
+    QString filePath=(model->filePath(index));
+
+    emit getText(filePath);
 
 }
 

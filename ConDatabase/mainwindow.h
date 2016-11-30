@@ -29,7 +29,12 @@
 #include"dispdata.h"
 #include"filetreeview.h"
 #include"workerthread.h"
+#include<QMdiArea>
+#include<QToolButton>
+#include<QCompleter>
+#include<QLabel>
 #include"browser.h"
+#include"xlsxdocument.h"
 class SetToolBtn : public QToolButton
 {
     Q_OBJECT
@@ -41,7 +46,7 @@ signals:
 
 
 protected:
-//    void paintEvent(QPaintEvent *);
+    //    void paintEvent(QPaintEvent *);
 private:
     QPixmap normalPixmap;
 
@@ -66,15 +71,16 @@ public:
     void setToolBtnLayout_File();
     void setToolBtnLayout_Edit();
     void setToolBtnLayout_About();
-//    void setDockMaximumSize();
+    //    void setDockMaximumSize();
 
 private slots:
     void on_sel_sex(const QString &text);
     void search();
     void setText(const QString&string);
-//    void finishThread(const QStringList&stringlist);
+    void timerUpDate();
+    //    void finishThread(const QStringList&stringlist);
 
-
+    void slot_writeToExcel();
     //整合1
     void on_action_Tool_File_triggered();
 
@@ -83,7 +89,9 @@ private slots:
     void on_action_Tool_About_triggered();
 
 signals:
-
+protected:
+    void dragEnterEvent(QDragEnterEvent *);
+    void dropEvent(QDropEvent *);
 private:
     Ui::MainWindow *ui;
     void initlayout();
@@ -92,7 +100,7 @@ private:
 private:
     WorkerThread *mWorkerthread;
     QStringList mStringlist;
-//    TreeView    *mTreeView;
+    //    TreeView    *mTreeView;
     QDockWidget *mcenter;
     QDockWidget *mUpLeftDock;
     QDockWidget *mDownLeftDock;
@@ -109,58 +117,65 @@ private:
     QComboBox *cbo_sex;
     QHBoxLayout *hLayout;
     QPushButton *pSearchButton;
-//    CompleteLineEdit *edit;
+    //    CompleteLineEdit *edit;
     QLineEdit *edit;
     QCompleter *completer;
     QDirModel * model ;
     QHBoxLayout *pcbosex_Layout;
     FileTreeview * fileTreeview;
     Dispdata *dispdata;
-   //整合1
+
+    QTableWidget *m_excelWidget;
+    QPushButton * m_excelBtn;
+
+    //整合1
     QDockWidget *mTopWidgetToolFile;
-        QDockWidget *mTopWidgetToolEdit;
-        QDockWidget *mTopWidgetToolAbout;
+    QDockWidget *mTopWidgetToolEdit;
+    QDockWidget *mTopWidgetToolAbout;
 
-        QDockWidget *mTenterWidget;
-        QDockWidget *mTeftWidgetTop;
-        QDockWidget *mTeftWidgetDown;
+    QDockWidget *mTenterWidget;
+    QDockWidget *mTeftWidgetTop;
+    QDockWidget *mTeftWidgetDown;
 
-        QStatusBar *mTtatusBar;
+    QStatusBar *mTtatusBar;
 
-        QTextEdit *mText2;
-        QTextEdit *mTextCenter;
-        QTextEdit *mTextToolFile;
-        QTextEdit *mTextToolEdit;
-        QTextEdit *mTextToolAbout;
-        QTextEdit *textEdit2;
-        QTextEdit *textEdit3;
+    QTextEdit *mText2;
+    QTextEdit *mTextCenter;
+    QTextEdit *mTextToolFile;
+    QTextEdit *mTextToolEdit;
+    QTextEdit *mTextToolAbout;
+    QTextEdit *textEdit2;
+    QTextEdit *textEdit3;
+    QLabel *hint_label;
+    QLabel *time_label;
+    QMdiArea *mdiarea;
 
-        QLineEdit *mSearchLineEdit;
-        //SearchButton *m_searchButton;
+    QLineEdit *mSearchLineEdit;
+    //SearchButton *m_searchButton;
 
-        SetToolBtn *mNewFileBtn;
-        SetToolBtn *mOpenFileBtn;
-        SetToolBtn *mCloseBtn;
-        SetToolBtn *mSaveBtn;
-        SetToolBtn *mSaveAsBtn;
-        SetToolBtn *mPrintBtn;
-        SetToolBtn *mQuitBtn;
+    SetToolBtn *mNewFileBtn;
+    SetToolBtn *mOpenFileBtn;
+    SetToolBtn *mCloseBtn;
+    SetToolBtn *mSaveBtn;
+    SetToolBtn *mSaveAsBtn;
+    SetToolBtn *mPrintBtn;
+    SetToolBtn *mQuitBtn;
 
-        SetToolBtn *mUndoBtn;
-        SetToolBtn *mCutBtn;
-        SetToolBtn *mCopyBtn;
-        SetToolBtn *mPastBtn;
-        SetToolBtn *mFindBtn;
+    SetToolBtn *mUndoBtn;
+    SetToolBtn *mCutBtn;
+    SetToolBtn *mCopyBtn;
+    SetToolBtn *mPastBtn;
+    SetToolBtn *mFindBtn;
 
-        SetToolBtn *mAboutBtn;
+    SetToolBtn *mAboutBtn;
 
-        QHBoxLayout *mHlayoutToolFile;
-        QHBoxLayout *mHlayoutToolEdit;
-        QHBoxLayout *mHlayoutToolAbout;
+    QHBoxLayout *mHlayoutToolFile;
+    QHBoxLayout *mHlayoutToolEdit;
+    QHBoxLayout *mHlayoutToolAbout;
 
-        bool mShowToolFile;
-        bool mShowToolEdit;
-        bool mShowToolAbout;
+    bool mShowToolFile;
+    bool mShowToolEdit;
+    bool mShowToolAbout;
 };
 
 #endif // MAINWINDOW_H

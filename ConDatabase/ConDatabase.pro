@@ -5,8 +5,9 @@
 #-------------------------------------------------
 
 QT       += core gui
-QT       += sql
-QT       += webkit
+QT       += sql webkitwidgets xlsx
+
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -20,9 +21,10 @@ SOURCES += main.cpp             \
            qpasswordlineedit.cpp\
            completelineedit.cpp \
     filetreeview.cpp \
-    dispdata.cpp \
     workerthread.cpp \
+    dispdata.cpp \
     browser.cpp
+
 
 HEADERS  += mainwindow.h \
     cmysplashscreen.h \
@@ -40,7 +42,8 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     login.ui \
     registeruser.ui \
-    browser.ui
+    browser.ui \
+    webbrowser.ui
 
 RESOURCES += \
     myresources.qrc

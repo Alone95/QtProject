@@ -4,7 +4,7 @@
 Dispdata::Dispdata(QListWidget*parent)
     :QListWidget(parent)
 {
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf-8"));
+//    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf-8"));
     clickedTimer=new QTimer;
     isDouble=false;
     this->setAutoScroll(true);

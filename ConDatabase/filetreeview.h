@@ -24,10 +24,13 @@ signals:
 
 
 private slots:
-   void test();
+   void test(const QModelIndex&);
 
 private:
     bool FindFile(const QString &path);
+
+private:
+    QFileSystemModel *model;
 
 };
 

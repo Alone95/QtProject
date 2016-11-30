@@ -146,7 +146,10 @@ void Login::on_loginBtn_clicked()
                 this->close();
                 //用户名和密码均正确
                 MainWindow *mw =new MainWindow();
-                mw->show();
+//                QDesktopWidget *desktop =qApp->desktop();
+//                mw->resize(870,600);
+//                mw->move((desktop->width() - this->width())/2, (desktop->height() - this->height())/2);
+                mw->showMaximized();
 
 
             }

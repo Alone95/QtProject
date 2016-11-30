@@ -5,7 +5,10 @@
 #include <QMessageBox>
 #include <QMargins>
 #include <QLineEdit>
-
+#include<QDragEnterEvent>
+#include<QUrl>
+#include<QTextStream>
+#include<QString>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -18,6 +21,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(edit, SIGNAL(returnPressed()), this, SLOT(search()));
     connect(pSearchButton,SIGNAL(clicked(bool)),this,SLOT(search()));
     connect(fileTreeview,SIGNAL(getText(QString)),this,SLOT(setText(QString)));
+
+    QTimer *timer = new QTimer(this);//新建定时器
+    connect(timer,SIGNAL(timeout()),this,SLOT(timerUpDate()));//关联定时器计满信号和相应的槽函数
+    timer->start(1000);//定时器开始计时，其中1000表示1000ms即1秒
 
     //整合1
     mShowToolFile=false;
@@ -67,7 +74,7 @@ void MainWindow::initlayout()
 
     //    sl=currentDir.entryList(QStringList("*"),QDir::Files|QDir::Dirs);
     //    QStringList sl = QStringList() << "Biao" << "Bin" << "Huang" << "Hua" << "Hello" << "BinBin" << "Hallo";
-//    edit= new CompleteLineEdit;
+    //    edit= new CompleteLineEdit;
     edit=new QLineEdit;
     completer =new QCompleter;
     model =new QDirModel;
@@ -97,7 +104,7 @@ void MainWindow::initlayout()
 
 
     mUpLeftDock = new QDockWidget(tr("我的电脑"),this);
-    mUpRightDock = new QDockWidget(tr("主界面"),this);
+    mUpRightDock = new QDockWidget(tr("文本编辑器"),this);
     mDownLeftDock = new QDockWidget(tr("数据库"),this);
     mDownRightDock = new QDockWidget(tr("浏览器"),this);
 
@@ -105,7 +112,8 @@ void MainWindow::initlayout()
     addDockWidget(Qt::LeftDockWidgetArea,mUpLeftDock);
     splitDockWidget(mUpLeftDock,mUpRightDock,Qt::Horizontal);
     splitDockWidget(mUpLeftDock,mDownLeftDock,Qt::Vertical);
-    splitDockWidget(mUpRightDock,mDownRightDock,Qt::Vertical);
+//    splitDockWidget(mUpRightDock,mDownRightDock,Qt::Vertical);
+    tabifyDockWidget(mUpRightDock,mDownRightDock);
     mUpLeftDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     mDownLeftDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
 
@@ -114,7 +122,7 @@ void MainWindow::initlayout()
     mUpLeftDock->setMaximumWidth(300);
     mDownLeftDock->setMaximumWidth(300);
 
-    mDownRightDock->adjustSize();
+
     fileTreeview =new FileTreeview();
     QVBoxLayout *vboxLayout= new QVBoxLayout();
     vboxLayout->addLayout(pSearchLayout);
@@ -127,18 +135,84 @@ void MainWindow::initlayout()
     dispdata =new Dispdata();
     mDownLeftDock->setWidget(dispdata);
 
-    textEdit2 = new QTextEdit("右上侧");
-    mUpRightDock->setWidget(textEdit2);
+
+//    textEdit2 = new QTextEdit("右上侧");
+    QWidget *upleftwidget =new QWidget(this);
+    QHBoxLayout *hlayout =new QHBoxLayout();
+    QVBoxLayout *vlayout =new QVBoxLayout();
+    QXlsx::Document xlsx("G:/计算机14-01.xlsx");
+    QXlsx::CellRange range=xlsx.dimension();
+    int rowcount=range.rowCount();
+    int columncount= range.columnCount();
+    qDebug()<<rowcount<<columncount;
+    m_excelWidget =new QTableWidget();
+    m_excelBtn=new QPushButton("生成excel");
+    connect(m_excelBtn,SIGNAL(clicked()),this,SLOT(slot_writeToExcel()));
+
+    hlayout->addStretch(10);
+    hlayout->addWidget(m_excelBtn);
+
+    vlayout->addWidget(m_excelWidget);
+    vlayout->addLayout(hlayout);
+    upleftwidget->setLayout(vlayout);
+    m_excelWidget->setRowCount(rowcount);
+    m_excelWidget->setColumnCount(columncount);
+    for(int i=0;i<rowcount;i++){
+        for(int j=0;j<columncount;j++){
+
+            QTableWidgetItem *item =new QTableWidgetItem(xlsx.read(i,j).toString());
+            item->setTextAlignment(Qt::AlignCenter);
+            m_excelWidget->setItem(i,j,item);
+        }
+    }
+    m_excelWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    m_excelWidget->setEditTriggers(QHeaderView::DoubleClicked);
+    m_excelWidget->setSelectionBehavior(QHeaderView::SelectRows);
+    m_excelWidget->horizontalHeader()->setVisible(true);
+    m_excelWidget->verticalHeader()->setVisible(true);
+
+
+    mUpRightDock->setWidget(upleftwidget);
 
 
     Browser *browser =new Browser();
-    browser->show();
+//    textEdit2 =new QTextEdit();
     mDownRightDock->setWidget(browser);
 
-
-
+    hint_label= new QLabel();
+    time_label= new QLabel();
+    time_label->setMinimumSize(time_label->sizeHint());
+    time_label->setAlignment(Qt::AlignCenter);
+    hint_label->setText(tr("欢迎使用"));
+    ui->statusBar->addWidget(hint_label,1);
+    ui->statusBar->addWidget(time_label,0);
+    ui->statusBar->setStyleSheet(QString("QStatusBar::item{border:0px}"));//去掉label的边框.
 
 }
+
+void MainWindow::slot_writeToExcel()
+{
+    QXlsx::Document xlsx;
+    int rows =m_excelWidget->rowCount();
+    int cols= m_excelWidget->columnCount();
+    QString text;
+    for(int i=0;i<rows;i++){
+        for(int j=0;j<cols;j++){
+            text= m_excelWidget->item(i,j)->text();
+            xlsx.write(i+1,j+1,text);
+        }
+    }
+    xlsx.saveAs("G:/副本.xlsx");
+}
+
+void MainWindow::timerUpDate()//定时器更新时间的显示
+{
+    QDateTime time = QDateTime::currentDateTime();//获取系统现在的时间
+    QString str = time.toString("yyyy-MM-dd hh:mm:ss dddd");//设置系统时间显示格式
+    time_label->setText(str); //在标签上显示时间
+
+}
+
 
 void MainWindow::on_sel_sex(const QString &text)
 {
@@ -158,7 +232,14 @@ void MainWindow::search()
 
 void MainWindow::setText(const QString &string)
 {
-    textEdit2->setText(string);
+    QString cut =string.section(".",-1,-1);
+    if(cut=="txt"){
+        QFile file(string);
+        if(!file.open(QIODevice::ReadOnly)) return;
+        QTextStream in(&file);
+        textEdit2->setText(in.readAll());
+
+    }
 }
 
 
@@ -341,3 +422,31 @@ SetToolBtn::SetToolBtn(QString background, QString toolTips,QWidget *parent):
     this->setContentsMargins(0,0,0,0);
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
+
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if(event->mimeData()->hasUrls())
+        event->acceptProposedAction();
+    else
+        event->ignore();
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    const QMimeData *mimeData =event->mimeData();
+    if(mimeData->hasUrls()){
+
+        QList<QUrl>urllist =mimeData->urls();
+        QString fileName =urllist.at(0).toLocalFile();
+        if(!fileName.isEmpty())
+        {
+            QFile file(fileName);
+            if(!file.open(QIODevice::ReadOnly))return;
+            QTextStream in(&file);
+            textEdit2->setText(in.readAll());
+        }
+    }
+}
+
+
