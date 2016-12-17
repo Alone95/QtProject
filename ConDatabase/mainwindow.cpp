@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    setAcceptDrops(true);
     initlayout();//初始化布局
 
     connect(cbo_sex, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(on_sel_sex(const QString &)));
@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mShowToolFile=false;
     mShowToolEdit=false;
     mShowToolAbout=false;
+    mediaplayer =new QMediaPlayer();
 }
 
 
@@ -72,9 +73,6 @@ void MainWindow::initlayout()
     cbo_sex->addItem(QWidget::tr("本地文件"));
     cbo_sex->addItem(QWidget::tr("数据库文件"));
 
-    //    sl=currentDir.entryList(QStringList("*"),QDir::Files|QDir::Dirs);
-    //    QStringList sl = QStringList() << "Biao" << "Bin" << "Huang" << "Hua" << "Hello" << "BinBin" << "Hallo";
-    //    edit= new CompleteLineEdit;
     edit=new QLineEdit;
     completer =new QCompleter;
     model =new QDirModel;
@@ -88,8 +86,8 @@ void MainWindow::initlayout()
                                  QPushButton:hover{border-image:url(:/myImages/icon_search_hover.png)} \
                                  QPushButton:pressed{border-image:url(:/myImages/icon_search_press.png)}");
 
-                                 QMargins margins =edit->textMargins();
-            edit->setTextMargins(margins.left(),margins.top(),pSearchButton->width(),margins.bottom());
+    QMargins margins =edit->textMargins();
+    edit->setTextMargins(margins.left(),margins.top(),pSearchButton->width(),margins.bottom());
     edit->setPlaceholderText("请输入搜索内容");
     QHBoxLayout *pSearchLayout2= new QHBoxLayout();
     pSearchLayout2->addStretch();
@@ -102,82 +100,85 @@ void MainWindow::initlayout()
     pSearchLayout->addWidget(cbo_sex);
     pSearchLayout->addWidget(edit);
 
-
     mUpLeftDock = new QDockWidget(tr("我的电脑"),this);
     mUpRightDock = new QDockWidget(tr("文本编辑器"),this);
     mDownLeftDock = new QDockWidget(tr("数据库"),this);
     mDownRightDock = new QDockWidget(tr("浏览器"),this);
 
+
     setCentralWidget(mUpLeftDock);
     addDockWidget(Qt::LeftDockWidgetArea,mUpLeftDock);
     splitDockWidget(mUpLeftDock,mUpRightDock,Qt::Horizontal);
     splitDockWidget(mUpLeftDock,mDownLeftDock,Qt::Vertical);
-//    splitDockWidget(mUpRightDock,mDownRightDock,Qt::Vertical);
+
     tabifyDockWidget(mUpRightDock,mDownRightDock);
     mUpLeftDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     mDownLeftDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    mUpRightDock->raise();
+    mUpLeftDock->setMinimumWidth(250);
+    mDownLeftDock->setMinimumWidth(250);
+    mUpLeftDock->setMaximumWidth(250);
+    mDownLeftDock->setMaximumWidth(250);
 
-    mUpLeftDock->setMinimumWidth(200);
-    mDownLeftDock->setMinimumWidth(200);
-    mUpLeftDock->setMaximumWidth(300);
-    mDownLeftDock->setMaximumWidth(300);
 
 
     fileTreeview =new FileTreeview();
     QVBoxLayout *vboxLayout= new QVBoxLayout();
     vboxLayout->addLayout(pSearchLayout);
     vboxLayout->addWidget(fileTreeview);
-
+    //FileView
     QWidget *widget=new QWidget();
     widget->setLayout(vboxLayout);
     mUpLeftDock->setWidget(widget);
-
+    //Database
     dispdata =new Dispdata();
     mDownLeftDock->setWidget(dispdata);
 
+    //Excel
+//    QWidget *upleftwidget =new QWidget(this);
+//    QHBoxLayout *hlayout =new QHBoxLayout();
+//    QVBoxLayout *vlayout =new QVBoxLayout();
+//    QXlsx::Document xlsx("G:/计算机14-01.xlsx");
+//    QXlsx::CellRange range=xlsx.dimension();
+//    int rowcount=range.rowCount();
+//    int columncount= range.columnCount();
+//    qDebug()<<rowcount<<columncount;
+//    m_excelWidget =new QTableWidget();
+//    m_excelBtn=new QPushButton("生成excel");
+//    connect(m_excelBtn,SIGNAL(clicked()),this,SLOT(slot_writeToExcel()));
 
-//    textEdit2 = new QTextEdit("右上侧");
-    QWidget *upleftwidget =new QWidget(this);
-    QHBoxLayout *hlayout =new QHBoxLayout();
-    QVBoxLayout *vlayout =new QVBoxLayout();
-    QXlsx::Document xlsx("G:/计算机14-01.xlsx");
-    QXlsx::CellRange range=xlsx.dimension();
-    int rowcount=range.rowCount();
-    int columncount= range.columnCount();
-    qDebug()<<rowcount<<columncount;
-    m_excelWidget =new QTableWidget();
-    m_excelBtn=new QPushButton("生成excel");
-    connect(m_excelBtn,SIGNAL(clicked()),this,SLOT(slot_writeToExcel()));
+//    hlayout->addStretch(10);
+//    hlayout->addWidget(m_excelBtn);
 
-    hlayout->addStretch(10);
-    hlayout->addWidget(m_excelBtn);
+//    vlayout->addWidget(m_excelWidget);
+//    vlayout->addLayout(hlayout);
+//    upleftwidget->setLayout(vlayout);
+//    m_excelWidget->setRowCount(rowcount);
+//    m_excelWidget->setColumnCount(columncount);
+//    for(int i=0;i<rowcount;i++){
+//        for(int j=0;j<columncount;j++){
 
-    vlayout->addWidget(m_excelWidget);
-    vlayout->addLayout(hlayout);
-    upleftwidget->setLayout(vlayout);
-    m_excelWidget->setRowCount(rowcount);
-    m_excelWidget->setColumnCount(columncount);
-    for(int i=0;i<rowcount;i++){
-        for(int j=0;j<columncount;j++){
+//            QTableWidgetItem *item =new QTableWidgetItem(xlsx.read(i,j).toString());
+//            item->setTextAlignment(Qt::AlignCenter);
+//            m_excelWidget->setItem(i,j,item);
+//        }
+//    }
+//    m_excelWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+//    m_excelWidget->setEditTriggers(QHeaderView::DoubleClicked);
+//    m_excelWidget->setSelectionBehavior(QHeaderView::SelectRows);
+//    m_excelWidget->horizontalHeader()->setVisible(true);
+//    m_excelWidget->verticalHeader()->setVisible(true);
+    mdiarea =new QMdiArea();
+    mdiarea->setViewMode(QMdiArea::TabbedView);
+    mdiarea->setTabPosition(QTabWidget::North);
+    mdiarea->setTabsClosable(true);
+    mdiarea->setTabsMovable(true);
+    mdiarea->setTabShape(QTabWidget::Triangular);
+    mUpRightDock->setWidget(mdiarea);
 
-            QTableWidgetItem *item =new QTableWidgetItem(xlsx.read(i,j).toString());
-            item->setTextAlignment(Qt::AlignCenter);
-            m_excelWidget->setItem(i,j,item);
-        }
-    }
-    m_excelWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-    m_excelWidget->setEditTriggers(QHeaderView::DoubleClicked);
-    m_excelWidget->setSelectionBehavior(QHeaderView::SelectRows);
-    m_excelWidget->horizontalHeader()->setVisible(true);
-    m_excelWidget->verticalHeader()->setVisible(true);
-
-
-    mUpRightDock->setWidget(upleftwidget);
-
-
-    Browser *browser =new Browser();
-//    textEdit2 =new QTextEdit();
-    mDownRightDock->setWidget(browser);
+    //Browser
+//    Browser *browser =new Browser();
+//    mDownRightDock->setWidget(browser);
 
     hint_label= new QLabel();
     time_label= new QLabel();
@@ -232,14 +233,64 @@ void MainWindow::search()
 
 void MainWindow::setText(const QString &string)
 {
-    QString cut =string.section(".",-1,-1);
-    if(cut=="txt"){
-        QFile file(string);
-        if(!file.open(QIODevice::ReadOnly)) return;
-        QTextStream in(&file);
-        textEdit2->setText(in.readAll());
+    QString suffix =string.section(".",-1,-1);
+    QTextEdit * textedit =new QTextEdit();
+
+    QFile file(string);
+    QTextStream in(&file);
+    if(!file.open(QIODevice::ReadOnly)) return;
+
+    if(suffix=="txt"||suffix=="ini"||suffix=="log"||suffix=="java"||suffix=="sql"||suffix=="xml")
+    {
+         QMdiSubWindow *child = mdiarea->addSubWindow(textedit);
+         textedit->setText(in.readAll());
+         child->setWindowTitle(string);
+         child->show();
+    }
+    else if(suffix=="h"||suffix=="cpp"||suffix=="py")
+    {
+         QMdiSubWindow *child = mdiarea->addSubWindow(textedit);
+         in.setCodec("utf-8");
+         textedit->setText(in.readAll());
+         child->setWindowTitle(string);
+         child->show();
+    }
+    else if(suffix=="jpg"||suffix=="png")
+    {
+        QImage image(string);
+        QLabel *label =new QLabel();
+        image=image.scaled(label->size(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        label->setPixmap(QPixmap::fromImage(image));
+        label->setAlignment(Qt::AlignCenter);
+        QMdiSubWindow *child = mdiarea->addSubWindow(label);
+        child->setWindowTitle(string);
+        child->show();
+    }
+    else if(suffix=="gif")
+    {
+
+        QLabel *label =new QLabel();
+        QMovie *movie =new QMovie(string);
+        label->setMovie(movie);
+        label->setAlignment(Qt::AlignCenter);
+        QMdiSubWindow *child =mdiarea->addSubWindow(label);
+        child->setWindowTitle(string);
+        child->show();
+        movie->start();
 
     }
+    else if(suffix=="mp3"||suffix=="wma")
+    {
+
+        mediaplayer->stop();
+        mediaplayer->setMedia(QUrl::fromLocalFile(string));
+        mediaplayer->play();
+        QMessageBox::information(this,"正在播放",string);
+    }
+    else
+        return;
+
+
 }
 
 
@@ -281,7 +332,10 @@ void MainWindow::creatToolBars_Edit()
     QWidget *noTitleBarToolEdit=new QWidget;
     mTopWidgetToolEdit->setTitleBarWidget(noTitleBarToolEdit);
     mTopWidgetToolEdit->setMaximumHeight(40);
-    this->addDockWidget(Qt::TopDockWidgetArea,mTopWidgetToolEdit);
+    addDockWidget(Qt::TopDockWidgetArea,mTopWidgetToolEdit);
+
+
+
     //Tool_Edit_Btn
     mUndoBtn=new SetToolBtn(":/myImages/images/undo.png",tr("撤销"),mTextToolEdit);
     mCutBtn=new SetToolBtn(":/myImages/images/cut.png",tr("剪切"),mTextToolEdit);
@@ -341,10 +395,6 @@ void MainWindow::setToolBtnLayout_About()
     mTextToolAbout->setLayout(mHlayoutToolAbout);
 }
 
-//void MainWindow::setDockMaximumSize()
-//{
-//    mText2->setMaximumSize(16777215, 16777215);
-//}
 
 void MainWindow::on_action_Tool_File_triggered()
 {
@@ -438,15 +488,76 @@ void MainWindow::dropEvent(QDropEvent *event)
     if(mimeData->hasUrls()){
 
         QList<QUrl>urllist =mimeData->urls();
-        QString fileName =urllist.at(0).toLocalFile();
-        if(!fileName.isEmpty())
+        if(urllist.isEmpty()) return;
+
+        foreach (QUrl url, urllist)
         {
-            QFile file(fileName);
-            if(!file.open(QIODevice::ReadOnly))return;
-            QTextStream in(&file);
-            textEdit2->setText(in.readAll());
+            QString fileName =url.toLocalFile();
+            qDebug()<<fileName;
+            if(!fileName.isEmpty())
+            {
+                QFile file(fileName);
+                QString suffix =fileName.section(".",-1,-1);
+                QTextEdit * textedit =new QTextEdit();
+                QTextStream in(&file);
+                if(!file.open(QIODevice::ReadOnly))return;
+
+                if(suffix=="txt"||suffix=="ini"||suffix=="log"||suffix=="java"||suffix=="sql"||suffix=="xml")
+                {
+                    QMdiSubWindow *child = mdiarea->addSubWindow(textedit);
+                    textedit->setText(in.readAll());
+                    child->setWindowTitle(fileName);
+                    child->show();
+                }
+                else if(suffix=="h"||suffix=="cpp"||suffix=="py")
+                {
+                    QMdiSubWindow *child = mdiarea->addSubWindow(textedit);
+                    in.setCodec("utf-8");
+                    textedit->setText(in.readAll());
+                    child->setWindowTitle(fileName);
+                    child->show();
+                }
+                else if(suffix=="jpg"||suffix=="png")
+                {
+
+                    QImage image(fileName);
+                    QLabel *label =new QLabel();
+                    image=image.scaled(label->size(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+                    label->setPixmap(QPixmap::fromImage(image));
+                    label->setAlignment(Qt::AlignCenter);
+                    QMdiSubWindow *child = mdiarea->addSubWindow(label);
+                    child->setWindowTitle(fileName);
+                    child->show();
+
+                }
+                else if(suffix=="gif")
+                {
+                    qDebug()<<suffix;
+                    QLabel *label =new QLabel();
+                    QMovie *movie =new QMovie(fileName);
+                    label->setMovie(movie);
+                    label->setAlignment(Qt::AlignCenter);
+                    QMdiSubWindow *child =mdiarea->addSubWindow(label);
+                    child->setWindowTitle(fileName);
+                    child->show();
+                    movie->start();
+
+                }
+                else if(suffix=="mp3"||suffix=="wma")
+                {
+                    mediaplayer->stop();
+                    mediaplayer->setMedia(QUrl::fromLocalFile(fileName));
+                    mediaplayer->play();
+                    QMessageBox::information(this,"正在播放",fileName);
+                }
+
+                else
+                    return;
+
+            }
         }
     }
+
 }
 
 

@@ -30,9 +30,12 @@
 #include"filetreeview.h"
 #include"workerthread.h"
 #include<QMdiArea>
+#include<QMdiSubWindow>
 #include<QToolButton>
 #include<QCompleter>
 #include<QLabel>
+#include<QMovie>
+#include<QMediaPlayer>
 #include"browser.h"
 #include"xlsxdocument.h"
 class SetToolBtn : public QToolButton
@@ -117,7 +120,7 @@ private:
     QComboBox *cbo_sex;
     QHBoxLayout *hLayout;
     QPushButton *pSearchButton;
-    //    CompleteLineEdit *edit;
+
     QLineEdit *edit;
     QCompleter *completer;
     QDirModel * model ;
@@ -127,7 +130,7 @@ private:
 
     QTableWidget *m_excelWidget;
     QPushButton * m_excelBtn;
-
+    QMediaPlayer *mediaplayer;
     //整合1
     QDockWidget *mTopWidgetToolFile;
     QDockWidget *mTopWidgetToolEdit;
@@ -151,7 +154,6 @@ private:
     QMdiArea *mdiarea;
 
     QLineEdit *mSearchLineEdit;
-    //SearchButton *m_searchButton;
 
     SetToolBtn *mNewFileBtn;
     SetToolBtn *mOpenFileBtn;

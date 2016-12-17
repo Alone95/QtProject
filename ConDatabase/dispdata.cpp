@@ -44,7 +44,7 @@ void Dispdata::display()
             listWidgetItem->setSizeHint(QSize(30,30));
             listWidgetItem->setForeground(Qt::black);//前景色
             listWidgetItem->setToolTip(QString(sqlTable->value(0).toString()));
-            listWidgetItem->setFont(QFont("Times",22));
+            listWidgetItem->setFont(QFont("等线 Light",20));
             this->addItem(listWidgetItem);
 
         }
@@ -92,7 +92,7 @@ void Dispdata::connsql()
 {
 
     db = QSqlDatabase::addDatabase("QOCI");
-    db.setHostName("Lenovo-PC");
+    db.setHostName("172.22.136.170");
     db.setDatabaseName("orcl");
     db.setUserName("lds");
     db.setPassword("123456");
@@ -171,7 +171,7 @@ void Dispdata::add_data()
                 listWidgetItem->setSizeHint(QSize(30,30));
                 listWidgetItem->setToolTip(QString(fileName[i]));
                 listWidgetItem->setForeground(Qt::black);//前景色
-                listWidgetItem->setFont(QFont("Times",22));
+                listWidgetItem->setFont(QFont("等线 Light",20));
                 this->addItem(listWidgetItem);
             }
 
