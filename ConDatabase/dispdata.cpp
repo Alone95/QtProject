@@ -188,10 +188,10 @@ void Dispdata::add_data()
 void Dispdata::del_data()
 {
     QString url =this->currentItem()->text();
-    qDebug()<<url;
+    qDebug()<<url<<" "<<this->currentItem()->text();
     QSqlQuery colquery;
-    colquery.prepare("delete from blob_example where name =:dataname");
-    colquery.bindValue(":username",url);
+    colquery.prepare("delete from blob_example where name =:filename");
+    colquery.bindValue(":filename",url);
     if(colquery.exec())
     {
         QTime t;
@@ -204,7 +204,7 @@ void Dispdata::del_data()
         QListWidgetItem *listWidgetItem = this->currentItem();
         this->removeItemWidget(listWidgetItem);
         delete listWidgetItem;
-        colquery.finish();
+//        colquery.finish();
     }
     else
     {

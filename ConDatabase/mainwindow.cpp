@@ -177,8 +177,8 @@ void MainWindow::initlayout()
     mUpRightDock->setWidget(mdiarea);
 
     //Browser
-//    Browser *browser =new Browser();
-//    mDownRightDock->setWidget(browser);
+    Browser *browser =new Browser();
+    mDownRightDock->setWidget(browser);
 
     hint_label= new QLabel();
     time_label= new QLabel();
